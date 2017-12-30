@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>绘画旋转的图形</title>
+			<script type="text/javascript" src="js/jquery.min.js" ></script>
+		<style type="text/css">
+			#panel{
+				width: 400px;
+				height: 300px;
+				border: 1px solid saddlebrown;
+				margin: 10px 30px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="panel">
+			<canvas id="canvs_p" width="400" height="300"></canvas>
+		</div>
+		
+		
+		<script type="text/javascript">
+			var canvs=$("#canvs_p")[0];
+			var ctx=canvs.getContext("2d");
+			var width=$(canvs).attr("width");
+			var height=$(canvs).attr("height");
+			
+			var x0=width/2;        //直角坐标系中心的x位置
+			var y0=height/2			//直角坐标系中心的y位置
+			var xlen=(x0-10)/10;   //在直角坐标系中   1代表的长度
+			
+			drawPointInAxlis({x:x0,y:y0})
+			drawRect({x:x0+10,y:y0+20},40,50,0*Math.PI/18)
+			var i=0;
+			window.setInterval(function(){
+				i++
+//				clearPanel()
+//				drawPointInAxlis({x:x0,y:y0})
+				drawRoateRect({x:x0+10,y:y0+20},40,50,{x:x0,y:y0},i*Math.PI/18)
+			},1000)
+			
+			
+			function drawRect(p,w,h,scale){   //画图形
+				if(scale==undefined){
+					scale=0
+				}else{
+					scale=parseFloat(scale);
+				}
+				var p_list=[];
+				p_list.push(p);
+				p_list.push({x:p.x+w*Math.cos(scale),y:p.y+w*Math.sin(scale)});
+				p_list.push({x:p.x+w*Math.cos(scale)+h*Math.cos(scale+Math.PI/2),y:p.y+w*Math.sin(scale)+h*Math.sin(scale+Math.PI/2)});
+				p_list.push({x:p.x+h*Math.cos(scale+Math.PI/2),y:p.y+h*Math.sin(scale+Math.PI/2)});
+				drawPolygon(p_list)
+			}
+			
+			//以center为中心旋转  矩形
+			function drawRoateRect(p,w,h,center,scale){
+				var p_list=[];
+				p_list.push(getPointByRoate(p,center,scale));
+				p_list.push(getPointByRoate({x:p.x+w,y:p.y},center,scale));
+				p_list.push(getPointByRoate({x:p.x+w,y:p.y+h},center,scale));
+				p_list.push(getPointByRoate({x:p.x,y:p.y+h},center,scale));
+				drawPolygon(p_list)
+			}
+			
+			//求点旋转后的点坐标
+			function getPointByRoate(p,center,scale){
+				var v_x=[1,0];
+				var v_p=getVetor(p,center);
+				var v_len=calLineLength(p,center);
+				var v_radius=calVetorRadius(v_x,v_p);
+				return {x:center.x+v_len*Math.cos(v_radius+scale),y:center.y+v_len*Math.sin(v_radius+scale)}
+			}
+			
+			//计算单位向量  长度为1
+			function getVetor(p1,p2 ){
+				var x=p1.x-p2.x;
+				var y=p1.y-p2.y;
+				var len=Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
+				return [(x/len),(y/len)];
+			}
+			
+			/**
+			 * 计算单位向量的夹角
+			 * @param {Object} v1
+			 * @param {Object} v2
+			 */
+			function calVetorRadius(v1,v2){
+				return Math.acos((v1[0]*v2[0]+v1[1]*v2[1]))
+			}
+			
+			//计算两点的长度
+			function calLineLength(p1,p2){
+				return Math.sqrt(Math.pow((p1.x-p2.x),2)+Math.pow(p1.y-p2.y,2));
+			}
+			
+			//画多边形
+			function drawPolygon(list){
+				ctx.beginPath();
+				ctx.moveTo(list[0].x,list[0].y)
+				ctx.lineCap="round"
+				for(var i=1;i<list.length;i++){
+					ctx.lineTo(list[i].x,list[i].y)
+				}
+				ctx.closePath();
+				ctx.stroke()
+				for(var i=0;i<list.length;i++){
+					drawPointInAxlis(list[i])
+				}
+			}
+			
+			
+			//画点
+			function drawPointInAxlis(p){
+				ctx.beginPath()
+				ctx.arc(p.x,p.y,2,0,2*Math.PI,true);
+				ctx.fill()
+			}
+			
+			//清空画布
+			function  clearPanel(){
+				$(canvs).attr("width",width)
+			}
+			
+		</script>
+		
+	</body>
+</html>

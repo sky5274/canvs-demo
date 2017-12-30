@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>画图表</title>
+		<script type="text/javascript" src="js/jquery.min.js" ></script>
+		<script type="text/javascript" src="js/tab_canvs.js" ></script>
+		<style type="text/css">
+			#chart{width: 600px; height: 300px; border: 1px solid;margin-top: 20px;margin-left: 10px;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<div id="chart"></div>
+		<script type="text/javascript">
+			var tabs=tab.init($("#chart"))
+			$.each(tabs,function(i,tab){
+				var option={
+					title:{text:"ceshi"},
+					lenged:{data:['人数','年龄' ,'成绩','资产']},
+					xAxis:[{
+						data:['一般','优秀' ,'普通','良好','垃圾','仇恨']
+					}],
+					yAxis:[{
+						 type: 'value',
+				            name: '次数',
+				            axisLabel: {
+				                formatter: '{value}个'
+				            }
+					}],
+					series:[
+						{
+							name:"人数",
+							type:"bar",
+							data:[-20,25,56,68,6,65]
+						},
+						{
+							name:"年龄",
+							type:"bar",
+							data:[14,25,34,10,6,18]
+						},
+						{
+							name:"成绩",
+							type:"line",
+							data:[50,100,60,80,12,90]
+						},
+						{
+							name:"资产",
+							type:"line",
+							data:[23,70,50,83,24,70]
+						}
+					]
+					
+				}
+				tab.setOption(option)
+				tab.on("click",function(index){
+					console.log(index)
+				})
+			})
+		</script>
+	</body>
+</html>

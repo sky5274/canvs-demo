@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>自定义进度条</title>
+		<style type="text/css">
+			#progress{border: 1px solid red;width: 300px; height: 10px;border-radius: 10px;}
+		</style>
+		<script type="text/javascript" src="js/jquery.min.js" ></script>
+		<script type="text/javascript">
+			$(function(){
+				var target=$("<canvas id='demo'></canvas>")[0];
+				$("#progress").append(target)
+				var max_w=$("#progress").width()
+				var h=$("#progress").height()
+				var r=h/2;
+				var con=target.getContext("2d");
+				
+				var step=max_w/100;
+				var index=0;
+				var speed=1;
+				/*window.setInterval(function(){
+					clearCanvs(target,con)
+					if(index>100){
+						index=0;
+					}
+					drawProgress({r:r,len:step*index},con,"green");
+					index+=speed;
+				},1000)*/
+				drawTowTir(con)
+			})
+			
+			function clearCanvs(tar,con){
+				con.clearRect(0,0,$(tar).width(),$(tar).height());  
+			}
+			function drawProgress(c,con,color){   //画两边圆角的长方形
+				con.fillStyle=color;
+				con.beginPath();
+				if(c.len>2*c.r){
+					con.arc(c.r,c.r,c.r,(90/180)*Math.PI,Math.PI*(270/180),false);   //arc(x,y,r,start,stop)
+					con.lineTo(c.len-c.r,0)
+					con.arc(c.len-c.r,c.r,c.r,(270/180)*Math.PI,Math.PI*(90/180),false);
+					con.lineTo(c.r,2*c.r);
+				}else{
+					var tr=c.len/2;
+					var lr=Math.sqrt(Math.pow(c.r,2)-Math.pow(c.r-tr,2))
+					con.ellipse(tr,c.r,tr,lr,0,0,Math.PI*2,true);   //arc(x,y,r,start,stop)
+				}
+				con.closePath();
+				con.stroke();
+				con.fill()
+			}
+			
+			/**
+			 * 画规律的进度条
+			 * @param {Object} c
+			 * @param {Object} con
+			 */
+			function drawProgressT1(c,con){
+				if(c.len>2*c.r){
+				con.fillStyle=color;
+				con.beginPath();
+				con.arc(c.r,c.r,c.r,(90/180)*Math.PI,Math.PI*(270/180),false);   //arc(x,y,r,start,stop)
+				con.lineTo(c.len-c.r,0)
+				con.arc(c.len-c.r,c.r,c.r,(270/180)*Math.PI,Math.PI*(90/180),false);
+				con.lineTo(c.r,2*c.r);
+				con.closePath();
+				con.stroke();
+				con.fill()
+				}
+			}
+			
+			function drawTowTir(con){
+				var x0=4,y=30,w=5,h=10,p=8;  //p  代表偏移
+				var x=0;
+				var colorList=['red','blue']
+				var inc=0
+				var l2=[];
+					x=0;
+					l2.push({x:x,y:y})
+					l2.push({x:x+p,y:y})
+					l2.push({x:x,y:y+h})
+					var i1=0;i2=1;
+				drawTriangle(con,l2,colorList[0])
+				for(var i=0;i<40;i++){
+					var l1=[];
+					x=w*i;
+					l1.push({x:x+p,y:y})
+					l1.push({x:x+w+p,y:y})
+					l1.push({x:x+w,y:y+h})
+					l1.push({x:x,y:y+h})
+					var i1=0;i2=1;
+					if(inc==0){
+						inc=1;
+					}else{
+						inc=0
+					}
+					drawTriangle(con,l1,colorList[inc])
+				}
+				var l3=[];
+					x+=w+w+w-2;
+					l3.push({x:x,y:y})
+					l3.push({x:x,y:y+h})
+					l3.push({x:x-p,y:y+h})
+					var i1=0;i2=1;
+				drawTriangle(con,l3,colorList[1])
+				
+				
+			}
+			
+			function drawTriangle(con,plist,color){
+				con.fillStyle=color;
+				con.beginPath();
+				$.each(plist,function(i,p){
+					if(i==0){
+						con.moveTo(p.x,p.y)
+					}else{
+						con.lineTo(p.x,p.y)
+					}
+				})
+				con.closePath();
+				/*con.stroke();*/
+				con.fill()
+			}
+		</script>
+	</head>
+	<body>
+		<div id="progress"></div>
+		
+	</body>
+</html>

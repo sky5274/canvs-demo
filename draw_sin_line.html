@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>画sin的数学的曲线</title>
+		<script type="text/javascript" src="js/jquery.min.js" ></script>
+		<style type="text/css">
+			#panel{
+				width: 800px;
+				height: 300px;
+				border: 1px solid saddlebrown;
+				margin: 10px 30px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="panel">
+			<canvas id="canvs_p" width="800" height="300"></canvas>
+		</div>
+		
+		<script type="text/javascript">
+			/**
+			 * 画sin的数学曲线
+			 */
+			var canvs=$("#canvs_p")[0];
+			var ctx=canvs.getContext("2d");
+			var width=$(canvs).attr("width");
+			var height=$(canvs).attr("height");
+			
+			var x0=width/4;        //直角坐标系中心的x位置
+			var y0=height/2			//直角坐标系中心的y位置
+			var xlen=x0/Math.PI;   //在直角坐标系中   1代表的长度
+			drawxyAxlis();        //画直角坐标系和半径为1的圆 
+			
+			drawSin(Math.PI/2);           //画sin曲线
+			loopDraw();
+			
+			function drawxyAxlis(){
+				ctx.moveTo(0,y0)
+				ctx.lineTo(width,y0)
+				ctx.moveTo(x0,0);
+				ctx.lineTo(x0,height);
+				for(var i=1;i<3;i++){
+					ctx.moveTo(x0*(i+1),y0);
+					ctx.lineTo(x0*(i+1),y0+4);
+					ctx.fillText(i+'PI',x0*(i+1),y0+14 )
+				}
+				
+				ctx.stroke()
+				ctx.beginPath()
+				ctx.arc(x0,y0,xlen,0,2*Math.PI,true)
+				ctx.closePath()
+				ctx.stroke()
+			}
+			
+			//循环划线
+			function loopDraw(){
+				var i=0;
+				window.setInterval(function(){
+					i+=0.1;
+					clearPanel()
+					drawSin(i)
+					drawCricle(i)
+					drawxyAxlis();
+				},200)
+				
+			}
+			
+			//sin曲线
+			function drawSin(t){
+				var  y=Math.sin(t)*xlen;
+				ctx.beginPath();
+				ctx.moveTo(x0,y0+y);
+				for(var i=0;i<=2*x0;i+=10){
+					var y=Math.sin(((i/x0)*Math.PI+t))*xlen
+					ctx.lineTo(x0+i,y0+y)
+				}
+				ctx.stroke()
+			}
+			
+			function  drawCricle(t){
+				var  y=Math.sin(t)*xlen;
+				var x=Math.cos(t)*xlen;
+				ctx.beginPath();
+				ctx.arc(x0+x,y0+y,3,0,2*Math.PI,true)
+				ctx.stroke()
+				drawDashedLine(x,y)
+			}
+			
+			//在坐标系中画与坐标轴的垂直虚线
+			function  drawDashedLine(x,y){
+				ctx.beginPath()
+				var y_min=y>0?y0:y0+y;
+				var y_max=y>0?y0+y:y0;
+				var x_min=x>0?x0:x0+x;
+				var x_max=x>0?x0+x:x0;
+				
+				for(var i=y_min;i<y_max-5;i+=10){
+					ctx.moveTo(x0+x,i)
+					ctx.lineTo(x0+x,i+5)
+				}
+				for(var i=x_min;i<x_max-5;i+=10){
+					ctx.moveTo(i,y0+y)
+					ctx.lineTo(i+5,y0+y)
+				}
+			}
+			
+			//清空画布
+			function  clearPanel(){
+				$(canvs).attr("width",width)
+			}
+			
+		</script>
+	</body>
+</html>

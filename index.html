@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<script type="text/javascript" src="js/jquery.min.js" ></script>
+	</head>
+	<style type="text/css">
+		#demo{border: 1px solid blue;}
+		
+	</style>
+	<body>
+		
+		<h2>画布测试</h2>
+		<canvas id="demo" width="500" height="400"></canvas>
+	</body>
+	
+	<script type="text/javascript">
+		var target=$("#demo")[0];
+		var con=target.getContext("2d");
+		drawFillCircle("#FF0000",{x:50,y:19,r:19,angle:270},con)
+		drawLine({x:30,y:50},{x:40,y:100},"#111111")
+		drawCricle({x:100,y:19,r:19,angle:230},target.getContext("2d"))
+		drawRect({x:100,y:300,w:50,h:70},"blue",con);
+		drawTest({style:"30px Arial",con:"test ok",x:10,y:80},con)
+		
+	function drawFillCircle(color,c,con){   //画充实圆
+		con.fillStyle=color;
+		drawCricle(c,con)
+		con.fill()         //颜色填充
+	}
+	
+	function drawLine(p1,p2,color){   //划线
+		con.moveTo(p1.x,p1.y)
+		con.lineTo(p2.x,p2.y)
+		con.stroke()
+	}
+	
+	function drawCricle(c,con){   //画圆边线
+		con.beginPath();
+		con.arc(c.x,c.y,c.r,(c.angle/180)*Math.PI,Math.PI*2,true);   //arc(x,y,r,start,stop)
+		con.lineTo(c.x,c.y);
+		con.closePath();
+		con.stroke();
+	}
+	
+	function drawRect(rect,color,con){
+		con.fillStyle=color;
+		con.fillRect(rect.x,rect.y,rect.w,rect.h)
+		con.stroke()
+	}
+	
+	function drawTest(font,con){
+		con.font=font.style;
+		con.strokeText(font.con,font.x,font.y);
+	}
+	
+	</script>
+</html>

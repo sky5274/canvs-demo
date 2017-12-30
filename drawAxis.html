@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>直角坐标系操作</title>
+			<script type="text/javascript" src="js/jquery.min.js" ></script>
+		<style type="text/css">
+			#panel{
+				width: 400px;
+				height: 300px;
+				border: 1px solid saddlebrown;
+				margin: 10px 30px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="panel">
+			<canvas id="canvs_p" width="400" height="300"></canvas>
+		</div>
+		
+		
+		<script type="text/javascript">
+			var canvs=$("#canvs_p")[0];
+			var ctx=canvs.getContext("2d");
+			var width=$(canvs).attr("width");
+			var height=$(canvs).attr("height");
+			
+			var x0=width/2;        //直角坐标系中心的x位置
+			var y0=height/2			//直角坐标系中心的y位置
+			var xlen=(x0-10)/10;   //在直角坐标系中   1代表的长度
+			drawxyAxlis();        //画直角坐标系和半径为1的圆 
+			
+			//根据给定的坐标画线
+			
+			var v=drawLineByAxlis({x:1,y:4},{x:-3,y:5})
+			var v1=calverticalVetor(v)
+			var v2=calvetor({x:1,y:4},{x:2,y:1})
+			var radius=calLineRadius(v,v2);
+			var len=calLineLength({x:1,y:4},{x:2,y:1})
+			var vlen=len*Math.sin(radius); 
+			var v_p={x:2-v1[0]*vlen,y:1-v1[1]*vlen}
+			
+			console.log(v);
+			console.log(vlen)
+			drawLineByAxlis({x:2,y:1},v_p)
+			
+			//根据给定的坐标画线
+			function drawLineByAxlis(p1,p2){
+				ctx.beginPath()
+				ctx.moveTo(x0+p1.x*xlen,y0-p1.y*xlen);
+				ctx.lineTo(x0+p2.x*xlen,y0-p2.y*xlen);
+				ctx.stroke()
+				drawPointInAxlis(p1)
+				drawPointInAxlis(p2)
+				return calvetor(p1,p2);
+			}
+			
+			//计算向量  长度为1
+			function calvetor(p1,p2 ){
+				var x=p1.x-p2.x;
+				var y=p1.y-p2.y;
+				var len=Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
+				return [(x/len),(y/len)];
+			}
+			
+			//计算向量的垂直单位向量
+			function calverticalVetor(v){
+			/*	var x=1,y=1;
+				if(v[1]!=0){
+					y=v[0]/v[1];
+					var len=Math.sqrt(Math.pow(y,2)+Math.pow(x,2));
+					y=y/len;
+					x=x/len;
+				}else{
+					x=0;
+				}
+				return [x,y];*/
+				return [v[1],-v[0]];
+			}
+			
+			function calLineRadius(v1,v2){
+				return Math.acos((v1[0]*v2[0]+v1[1]*v2[1]))
+			}
+			
+			//计算两点的长度
+			function calLineLength(p1,p2){
+				return Math.sqrt(Math.pow((p1.x-p2.x),2)+Math.pow(p1.y-p2.y,2));
+			}
+			
+			//画点
+			function drawPointInAxlis(p){
+				ctx.beginPath()
+				ctx.arc(x0+p.x*xlen,y0-p.y*xlen,2,0,2*Math.PI,true);
+				ctx.fill()
+			}
+			
+			//画坐标系
+			function drawxyAxlis(){
+				ctx.moveTo(10,y0)
+				ctx.lineTo(width-10,y0)
+				ctx.moveTo(x0,10);
+				ctx.lineTo(x0,height-10);
+				ctx.stroke()
+				drawArrow(width-10,y0,false)
+				drawArrow(x0,10,true)
+				drawLab()
+			}
+			
+			function drawLab(){
+				ctx.beginPath()
+				for(var i=1;x0+i*xlen<width-10;i++){
+					ctx.moveTo(x0+i*xlen,y0);
+					ctx.lineTo(x0+i*xlen,y0+6);
+					ctx.fillText(i,x0+i*xlen,y0+15)
+					ctx.moveTo(x0-i*xlen,y0);
+					ctx.lineTo(x0-i*xlen,y0+6);
+					ctx.fillText(0-i,x0-i*xlen,y0+15)
+				}
+				for(var i=1;y0+i*xlen<height-10;i++){
+					ctx.moveTo(x0,y0+i*xlen);
+					ctx.lineTo(x0+6,y0+i*xlen);
+					ctx.fillText(-i,x0+15,y0+i*xlen)
+					ctx.moveTo(x0,y0-i*xlen);
+					ctx.lineTo(x0+6,y0-i*xlen);
+					ctx.fillText(i,x0+15,y0-i*xlen)
+				}
+				ctx.fill();
+				ctx.stroke()
+			}
+			
+			//画箭头
+			function drawArrow(x,y,flag){
+				 ctx.beginPath();
+	        	ctx.moveTo(x,y);
+	        	if(flag){
+		            ctx.lineTo(x+4,y);
+		            ctx.lineTo(x,y-10);
+		            ctx.lineTo(x-4,y);
+		        }else{
+		            ctx.lineTo(x,y-4);
+		            ctx.lineTo(x+10,y);
+		            ctx.lineTo(x,y+4);
+		        }
+	        ctx.fillStyle = "#666";
+	        ctx.fill();
+			}
+			
+		</script>
+		
+	</body>
+</html>
