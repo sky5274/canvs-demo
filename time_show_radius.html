@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>时间罗盘</title>
+		<script src="../js/jquery-3.3.1.min.js"></script>
+		<style type="text/css">
+			body{width: 100%; height: 700px; background-color: black;color: white;}
+			#time-panel{width: 100%; height: 100%; position: relative;}
+			#time-panel>div>div,span{position: absolute;}
+			#time-panel>div>span{color: aqua;}
+			.time_ative{color: aqua;}
+		</style>
+		<script type="text/javascript">
+			$(function(){
+				var panlewh=getPanelWH();
+				// $("#time-panel").width(panlewh.r)
+				// $("#time-panel").height(panlewh.r)
+				window.setTimeout(function(){
+					loadTime(getTime(),panlewh)
+					window.setInterval(function(){animateAllTime(getTime(),true)},1000)
+				},500)
+				
+			})
+			function getTime(){
+				var date=new Date()
+				return{year:date.getFullYear(),month:date.getMonth()+1,day:date.getDate(),hour:date.getHours(),min:date.getMinutes(),sec:date.getSeconds()};
+			}
+			
+			function loadTime(date,panlewh){
+				console.log(date)
+				for( var key in date){
+					setItemRoate($(".time_"+key).find("span"),{
+						y:panlewh.height/2,
+						x:(panlewh.width*0.5+panlewh.r*radius_r[key])+(key=='year'?40:20)
+					})
+					$(".time_"+key).find(".time-value").html(date[key])
+					.addClass("time-"+key+"-"+date[key]).addClass("time_ative")
+					setItemRoate($(".time_"+key).find(".time-value"),{
+						y:panlewh.height/2,
+						x:panlewh.width*0.5+panlewh.r*radius_r[key]
+					})
+				}
+				for( var key in date){
+					loadAllTime(key,date[key],panlewh)
+				}
+				animateAllTime(date)
+			}
+			
+			function animateAllTime(date,flag){
+				var panelwh=getPanelWH();
+				for( var key in date){
+					var r_rate=radius_r[key];
+					animateTime(panelwh,key,date[key],r_rate,flag)
+				}
+			}
+			
+			function  animateTime(panelwh,key,value,r_rate,flag){
+				var vals=$(".time_"+key).data("values");
+				if(vals){
+					var ind=vals[0]
+					var v_l=vals.length
+					var list=vals.join()+","+vals.join()
+					list=list.split(",").slice(value-ind,v_l+value-ind)
+					// console.log(value)
+					// console.log(list)
+					for( var i=0;i<list.length;i++){
+						var item=$(".time_"+key).find(".time-"+key+"-"+list[i]);
+						var radius=360*i/v_l;
+						setItemRoate(item,getRadiusItem(radius,panelwh,r_rate,flag));
+					}
+					if(key!='year'){
+						$(".time_"+key).find(".time_ative").removeClass("time_ative")
+						$(".time_"+key).find(".time-"+key+"-"+value).addClass("time_ative")
+					}
+				}
+			}
+			
+			function getRadiusItem(radius,panelwh,r_rate,flag){
+				var r=radius*Math.PI/180
+				//console.log(radius+"-"+Math.cos(r))
+				return {
+					isanimate:flag,
+					radius:radius,
+					x:panelwh.width*0.5+panelwh.r*Math.cos(r)*r_rate,
+					y:panelwh.height*0.5+panelwh.r*Math.sin(r)*r_rate*panelwh.direct
+				}
+			}
+			
+			function loadAllTime(key,value,panlewh){
+				if(key=='month'){
+					initTimeVlaue(key,value,12,panlewh)
+				}else if(key=="day"){
+					initTimeVlaue(key,value,31,panlewh)
+				}else if(key=="hour"){
+					initTimeVlaue(key,value,24,panlewh)
+				}else if(key=="min"){
+					initTimeVlaue(key,value,60,panlewh)
+				}else if(key=="sec"){
+					initTimeVlaue(key,value,60,panlewh)
+				}
+			}
+			
+			function setItemRoate(item,roate){
+				item.animate({
+					"position": "absolute",
+					
+					"top":roate.y+"px",
+					"left": roate.x+"px"
+				},500)
+				if(is_roate){
+					item.css("transform", "rotate("+(roate.radius?-roate.radius:0)+"deg)",)
+				}
+			}
+			
+			function initTimeVlaue(key,value,size,panlewh){
+				var values=[]
+					var index=1;
+				if(key=='min' || key=='sec'){
+					index=0;
+				}
+				for(var i=index;i<=size;i++){
+					values.push(i)
+					if(i!=value){
+						var time_ele=$("<div class='time-value time-"+key+"-"+i+"'>"+i+"</div>")
+						setItemRoate(time_ele,{
+							y:panlewh.height/2,
+							x:(panlewh.width*(0.5+radius_r[key]))
+						})
+						$(".time_"+key).append(time_ele)
+					}
+				}
+				$(".time_"+key).data("values",values)
+			}
+			
+			var radius_r={
+				year:0,
+				month:0.08,
+				day:0.16,
+				hour:0.24,
+				min:0.32,
+				sec:0.4
+			}
+			var is_roate=true;
+			function getPanelWH(){
+				var panel={width:$("#time-panel").width(),height:$("#time-panel").height()};
+				//panel.r=panel.width;
+				panel.r=800
+				panel.direct=-1
+				return panel;
+			}
+			
+		</script>
+	</head>
+	<body>	
+	<div id="time-panel">
+		<div class="time_year"><div class="time-value"></div><span>年</span></div>
+		<div class="time_month"><div class="time-value"></div><span>月</span></div>
+		<div class="time_day"><div class="time-value"></div><span>日</span></div>
+		<div class="time_hour"><div class="time-value"></div><span>时</span></div>
+		<div class="time_min"><div class="time-value"></div><span>分</span></div>
+		<div class="time_sec"><div class="time-value"></div><span>秒</span></div>
+	</div>
+	</body>
+		
+</html>
